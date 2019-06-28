@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Post List {% endblock %}
+
+{% block ust_icerik %}
+    {% endblock %}
+
+{% block content %}
+    <div class="row">
+    <div class="col-lg-12">
+
+    <div class="col-lg-6 col-lg-offset-3">
+<H2 class="page-header">{{ blog.title| upper }}
+    <small> {{ blog.created_date }}</small> <small><a href="{% url 'post-list' %}" class="pull-right">Liste</a></small>
+    <small>{{ blog.get_yayin_taslak_html | safe }}</small>
+</H2>
+        <div class="row">
+            <div class="col-lg-3 pull-right">
+                 <a class="btn btn-primary" href="{% url 'post-update' blog.slug %}">Güncelle</a>
+                 <a class="btn btn-danger" href="{% url 'post-delete' blog.slug %}">Sil</a>
+            </div>
+        </div>
+        <br>
+        {% if blog.get_image %}
+            <img class="img-responsive" src="{{ blog.get_image }}">
+        {% endif %}
+        <br>
+    <p>
+        {{ blog.content|safe }}
+    </p>
+        <p>
+            ------------------------------------------------------------------
+        </p>
+        <p>
+            Kategoriler: {{ blog.kategoriler.all | join:',' }}
+        </p>
+    <div class="row">
+        <h2 class="page-header">
+            Yorum Ekle
+        </h2>
+        <form action="{% url 'add-comment' blog.slug %}" method="post">
+            {% csrf_token %}
+            {{ form.media }}
+            {% for field in form %}
+                <div class="row">
+                    <div class="col-lg-9 col-lg-offset-2">
+                        <div class="form-group">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.errors %}
+                        {% for error in field.errors %}
+                            <span class="text-danger"><b>{{ error }}</b></span>
+                        {% endfor %}
+                    {% else %}
+                        {% if field.help_text %}
+                           <span class="text-success">{{ field.help_text }}</span>
+                        {% endif %}
+                    {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        <div class="row">
+                    <div class="col-lg-9 col-lg-offset-2">
+                        <div class="form-group">
+        <input type="submit" value="Yorum Yap" class="pull-right btn btn-success">
+                        </div></div></div>
+        </form>
+    </div>
+    <div class="row">
+        <h2 class="page-header">Yorumlar ({{ blog.get_blog_comment | length }})</h2>
+        <div class="col-lg-8">
+            {% for comment in blog.get_blog_comment %}
+            <div>
+               <span style="font-weight: bold">{{ comment.get_screen_name }}</span>
+                <span class="pull-right" style="font-weight: bold"><span class="glyphicon glyphicon-time"></span> {{ comment.comment_date|timesince }} önce</span>
+            </div>
+            <p>
+            {{ comment.icerik|safe }}
+            </p>
+            {% endfor %}
+        </div>
+    </div>
+    </div>
+
+    </div>
+    </div>
+{% endblock %}
